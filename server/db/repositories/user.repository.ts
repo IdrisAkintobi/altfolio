@@ -1,4 +1,3 @@
-import { UserRole } from "../../../shared/types.js";
 import User, { IUser } from "../models/User.js";
 import { BaseRepository } from "./base.repository.js";
 
@@ -21,7 +20,6 @@ export class UserRepository extends BaseRepository<IUser> {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
-        { _id: search },
       ];
     }
 

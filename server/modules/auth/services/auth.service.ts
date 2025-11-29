@@ -1,8 +1,8 @@
 import argon2 from "argon2";
-import { IUser } from "../../../db/models/User.js";
+import { type User } from "../../../../shared/types.js";
 import { AppError } from "../../../utils/index.js";
 import { generateToken } from "../../../utils/jwt.js";
-import { UserRepository } from "../repositories/user.repository.js";
+import { UserRepository } from "../../../db/repositories/user.repository.js";
 
 export interface RegisterData {
   name?: string;
@@ -50,7 +50,7 @@ export class AuthService {
       passwordHash,
     });
 
-    return this.generateAuthResponse(user);
+    return await this.generateAuthResponse(user.toObject());
   }
 
   async login(data: LoginData): Promise<AuthResponse> {
@@ -69,17 +69,14 @@ export class AuthService {
       throw AppError.unauthorized("Invalid email or password");
     }
 
-    return this.generateAuthResponse(user);
+    return await this.generateAuthResponse(user.toObject());
   }
 
-  private generateAuthResponse(user: IUser): AuthResponse {
-    const token = generateToken(user._id.toString());
+  private async generateAuthResponse(user: User): Promise<AuthResponse> {
+    const token = await generateToken(user.id);
 
     return {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      role: user.role,
+      ...user,
       token,
     };
   }

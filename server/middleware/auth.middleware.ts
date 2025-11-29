@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../db/models/User.js";
-import { AuthUser } from "../modules/investments/services/investment.service.js";
+import UserModel from "../db/models/User.js";
+import { type User } from "../../shared/types.js";
 import { AppError } from "../utils/app-error.js";
 import { verifyToken } from "../utils/jwt.js";
 
@@ -8,7 +8,7 @@ import { verifyToken } from "../utils/jwt.js";
 declare global {
   namespace Express {
     interface Request {
-      user?: AuthUser;
+      user?: User;
     }
   }
 }
@@ -28,16 +28,16 @@ export const authenticate = async (
     const token = authHeader.substring(7); // Remove "Bearer " prefix
 
     // Verify token
-    const decoded = verifyToken(token);
+    const decoded = await verifyToken(token);
 
     // Fetch user from database
-    const user = await User.findById(decoded.userId);
+    const user = await UserModel.findById(decoded.userId);
     if (!user) {
       throw AppError.unauthorized("User not found");
     }
 
-    // Attach user to request
-    req.user = user.toObject();
+    // Attach user to request (toObject uses transformDoc to convert _id to id)
+    req.user = user.toObject() as unknown as User;
 
     next();
   } catch (error) {

@@ -1,14 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { AssetType } from "../../../shared/types";
 
 export interface IInvestment extends Document {
-  assetName: string;
-  assetType: AssetType;
+  userId: mongoose.Types.ObjectId;
+  assetId: mongoose.Types.ObjectId;
   investedAmount: number;
   investmentDate: Date;
-  currentValue: number;
-  owners: mongoose.Types.ObjectId[];
-  updatedAt: Date;
+  assetPerformanceAtInvestment: number;
 }
 
 const transformDoc = (_doc: any, ret: any) => {
@@ -20,22 +17,41 @@ const transformDoc = (_doc: any, ret: any) => {
 
 const InvestmentSchema: Schema = new Schema(
   {
-    assetName: { type: String, required: true },
-    assetType: {
-      type: String,
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      enum: Object.values(AssetType),
     },
-    investedAmount: { type: Number, required: true },
-    investmentDate: { type: Date, required: true },
-    currentValue: { type: Number, required: true },
-    owners: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    assetId: {
+      type: Schema.Types.ObjectId,
+      ref: "Asset",
+      required: true,
+    },
+    investedAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    investmentDate: {
+      type: Date,
+      required: true,
+    },
+    assetPerformanceAtInvestment: {
+      type: Number,
+      required: true,
+      default: 0,
+      comment: "Asset performance percentage when this investment was made",
+    },
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true, transform: transformDoc },
-    toObject: { virtuals: true, transform: transformDoc },
+    toJSON: { transform: transformDoc },
+    toObject: { transform: transformDoc },
   }
 );
+
+// Compound indexes for efficient queries
+InvestmentSchema.index({ userId: 1, investmentDate: -1 });
+InvestmentSchema.index({ assetId: 1 });
 
 export default mongoose.model<IInvestment>("Investment", InvestmentSchema);

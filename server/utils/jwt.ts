@@ -1,29 +1,34 @@
-import jwt from "jsonwebtoken";
+import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { config } from "../config/env.js";
 
-export interface JwtPayload {
-  userId: string;
-}
+const secret = new TextEncoder().encode(config.jwtSecret);
 
-export interface DecodedToken extends JwtPayload {
-  iat: number;
-  exp: number;
-}
-
-export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
+export const generateToken = async (userId: string): Promise<string> => {
+  return await new SignJWT({ userId })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(config.jwtExpiresIn)
+    .sign(secret);
 };
 
-export const verifyToken = (token: string): DecodedToken => {
+export const verifyToken = async (token: string): Promise<JWTPayload> => {
   try {
-    return jwt.verify(token, config.jwtSecret) as DecodedToken;
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new Error("Token has expired");
+    const { payload } = await jwtVerify(token, secret);
+    
+    if (!payload.userId || typeof payload.userId !== 'string') {
+      throw new Error("Invalid token payload");
     }
-    if (error instanceof jwt.JsonWebTokenError) {
+    
+    return {
+      userId: payload.userId,
+      iat: payload.iat as number,
+      exp: payload.exp as number,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes("expired")) {
+        throw new Error("Token has expired");
+      }
       throw new Error("Invalid token");
     }
     throw error;

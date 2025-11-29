@@ -5,13 +5,11 @@ export class AppLogger {
   private static instance: AppLogger;
   private readonly logger: pino.Logger;
 
-  private constructor() {
-    const isDevelopment = config.nodeEnv !== "production";
-    const isProduction = config.nodeEnv === "production";
+  private constructor(existing?: pino.Logger) {
 
-    this.logger = pino({
-      level: config.logLevel || (isProduction ? "info" : "debug"),
-      transport: isDevelopment
+    this.logger = existing ?? pino({
+      level: config.logLevel || (config.isProd ? "info" : "debug"),
+      transport: config.isDev
         ? {
             target: "pino-pretty",
             options: {
@@ -28,12 +26,6 @@ export class AppLogger {
         },
       },
       timestamp: pino.stdTimeFunctions.isoTime,
-      // Production-specific settings
-      ...(isProduction && {
-        base: {
-          env: config.nodeEnv,
-        },
-      }),
     });
   }
 
@@ -96,10 +88,13 @@ export class AppLogger {
     this.logger.fatal(errorMeta, message);
   }
 
-  public child(bindings: Record<string, any>): pino.Logger {
-    return this.logger.child(bindings);
+  private child(bindings: Record<string, any>): AppLogger {
+    return new AppLogger(this.logger.child(bindings));
+  }
+
+  public createModuleLogger(name: string): AppLogger {
+    return this.child({module: name})
   }
 }
 
-// Export singleton instance (lazy initialized on first access)
 export const logger = AppLogger.getInstance();

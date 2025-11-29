@@ -1,30 +1,32 @@
-export enum ErrorCode {
+export const ErrorCode = {
   // General errors (1000-1999)
-  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
-  BAD_REQUEST = 'BAD_REQUEST',
-  NOT_FOUND = 'NOT_FOUND',
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  BAD_REQUEST: 'BAD_REQUEST',
+  NOT_FOUND: 'NOT_FOUND',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
 
   // Authentication & Authorization errors (2000-2999)
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  INVALID_TOKEN = 'INVALID_TOKEN',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+  INVALID_TOKEN: 'INVALID_TOKEN',
 
   // Resource errors (3000-3999)
-  RESOURCE_NOT_FOUND = 'RESOURCE_NOT_FOUND',
-  RESOURCE_ALREADY_EXISTS = 'RESOURCE_ALREADY_EXISTS',
-  DUPLICATE_ENTRY = 'DUPLICATE_ENTRY',
+  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+  RESOURCE_ALREADY_EXISTS: 'RESOURCE_ALREADY_EXISTS',
+  DUPLICATE_ENTRY: 'DUPLICATE_ENTRY',
 
   // Database errors (4000-4999)
-  DATABASE_ERROR = 'DATABASE_ERROR',
-  DATABASE_CONNECTION_ERROR = 'DATABASE_CONNECTION_ERROR',
-  QUERY_ERROR = 'QUERY_ERROR',
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  DATABASE_CONNECTION_ERROR: 'DATABASE_CONNECTION_ERROR',
+  QUERY_ERROR: 'QUERY_ERROR',
 
   // Business logic errors (5000-5999)
-  BUSINESS_LOGIC_ERROR = 'BUSINESS_LOGIC_ERROR',
-}
+  BUSINESS_LOGIC_ERROR: 'BUSINESS_LOGIC_ERROR',
+} as const
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode]
 
 export interface ErrorDetails {
   field?: string;
@@ -49,8 +51,6 @@ export class AppError extends Error {
   ) {
     super(message);
 
-    Object.setPrototypeOf(this, new.target.prototype);
-
     this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.code = code;
@@ -59,18 +59,6 @@ export class AppError extends Error {
     this.timestamp = new Date();
 
     Error.captureStackTrace(this, this.constructor);
-  }
-
-  public toJSON() {
-    return {
-      name: this.name,
-      message: this.message,
-      code: this.code,
-      statusCode: this.statusCode,
-      details: this.details,
-      timestamp: this.timestamp,
-      ...(process.env.NODE_ENV === 'development' && { stack: this.stack }),
-    };
   }
 
   // Factory methods for common errors

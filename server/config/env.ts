@@ -12,6 +12,8 @@ dotenv.config({ path: path.join(__dirname, "../../.env"), quiet: true });
 interface Config {
   readonly port: number;
   readonly nodeEnv: string;
+  readonly isDev: boolean;
+  readonly isProd: boolean;
   readonly allowedOrigins: readonly string[];
   readonly mongoUri: string;
   readonly logLevel: string;
@@ -19,9 +21,10 @@ interface Config {
   readonly jwtExpiresIn: string;
 }
 
+const REQUIRED_ENV_VAR = ["PORT", "NODE_ENV", "MONGO_URI", "JWT_SECRET"]
+
 function validateEnv(): Config {
-  const requiredEnvVars = ["PORT", "NODE_ENV", "MONGO_URI", "JWT_SECRET"];
-  const missing = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+  const missing = REQUIRED_ENV_VAR.filter((envVar) => !process.env[envVar]);
 
   if (missing.length > 0) {
     throw new Error(
@@ -37,6 +40,8 @@ function validateEnv(): Config {
   return {
     port,
     nodeEnv: process.env.NODE_ENV,
+    isDev: process.env.NODE_ENV === "development",
+    isProd: process.env.NODE_ENV === "production",
     allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || [],
     mongoUri: process.env.MONGO_URI,
     logLevel: process.env.LOG_LEVEL || "info",

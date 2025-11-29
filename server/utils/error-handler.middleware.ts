@@ -3,6 +3,7 @@ import { MongoError } from "mongodb";
 import { Error as MongooseError } from "mongoose";
 import { AppError, ErrorCode } from "./app-error.js";
 import { logger } from "./logger.js";
+import { ApiResponse } from "./api-response.js";
 
 /**
  * Handles MongoDB duplicate key errors (E11000)
@@ -134,7 +135,7 @@ export function errorHandler(
   error: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  _: NextFunction
 ): void {
   const appError = normalizeError(error);
 
@@ -154,27 +155,7 @@ export function errorHandler(
     logger.error("Non-operational error occurred", appError, logContext);
   }
 
-  // Send error response using standard format
-  const errors = appError.details?.errors;
-  const details = errors ? undefined : appError.details;
-
-  // Build error object
-  const errorObj: any = {
-    code: appError.code,
-    ...(errors && { errors }),
-    ...(details && { details }),
-  };
-
-  // Add stack trace in development
-  if (process.env.NODE_ENV === "development" && appError.stack) {
-    errorObj.stack = appError.stack;
-  }
-
-  res.status(appError.statusCode).json({
-    status: "error",
-    message: appError.message,
-    error: errorObj,
-  });
+  return ApiResponse.error(res, appError)
 }
 
 /**
@@ -182,7 +163,7 @@ export function errorHandler(
  */
 export function notFoundHandler(
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ): void {
   const error = AppError.notFound(`Route ${req.method} ${req.path} not found`);

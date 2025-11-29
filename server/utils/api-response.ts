@@ -1,4 +1,6 @@
 import { Response } from "express";
+import { AppError } from "./app-error";
+import { config } from "../config/env";
 
 export interface PaginationMeta {
   page: number;
@@ -62,5 +64,32 @@ export class ApiResponse {
       data: data.items,
       pagination: data.pagination,
     });
+  }
+
+  /**
+   * Send error response
+   */
+  static error<T>(res: Response, appError: AppError): void {
+  // Send error response using standard format
+  const errors = appError.details?.errors;
+  const details = errors ? undefined : appError.details;
+
+  // Build error object
+  const errorObj: any = {
+    code: appError.code,
+    ...(errors && { errors }),
+    ...(details && { details }),
+  };
+
+  // Add stack trace in development
+  if (config.isDev && appError.stack) {
+    errorObj.stack = appError.stack;
+  }
+
+  res.status(appError.statusCode).json({
+    status: "error",
+    message: appError.message,
+    error: errorObj,
+  });
   }
 }

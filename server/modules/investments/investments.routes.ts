@@ -22,14 +22,9 @@ router.get('/', investmentController.getAll);
 router.get('/:id', investmentController.getById);
 
 // @route   POST /api/v1/investments
-// @desc    Create an investment
-// @access  Admin only
-router.post('/', requireAdmin, CreateInvestmentDto.validate(), investmentController.create);
-
-// @route   PUT /api/v1/investments/:id
-// @desc    Update investment
-// @access  Admin only
-router.put('/:id', requireAdmin, UpdateInvestmentDto.validate(), investmentController.update);
+// @desc    Create an investment (or add to existing)
+// @access  Private (all authenticated users)
+router.post('/', CreateInvestmentDto.validate(), investmentController.create);
 
 // @route   DELETE /api/v1/investments/:id
 // @desc    Delete investment

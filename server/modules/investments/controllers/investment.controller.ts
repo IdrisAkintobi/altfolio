@@ -43,7 +43,10 @@ export class InvestmentController {
       });
     }
 
-    const investment = await this.investmentService.createInvestment(req.body);
+    const investment = await this.investmentService.createInvestment(
+      req.body,
+      req.user!
+    );
     ApiResponse.created(res, investment, "Investment created successfully");
   });
 

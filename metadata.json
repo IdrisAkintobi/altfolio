@@ -1,0 +1,5 @@
+{
+  "name": "Altfolio",
+  "description": "A comprehensive alternative investment tracking dashboard for fintech investors, featuring role-based access control, asset analytics, and portfolio management.",
+  "requestFramePermissions": []
+}

@@ -2,7 +2,6 @@
 
 ## High Priority
 
-- [ ] Add prettier, lint, and git hooks with husky
 - [ ] Unit & integration tests
 - [ ] Rate limiting
 

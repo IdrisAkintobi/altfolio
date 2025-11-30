@@ -1,114 +1,55 @@
-import React, { useState } from "react";
-import { MOCK_INVESTMENTS } from "../shared/constants";
-import { Investment, UserRole } from "../shared/types";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { AuthForm } from "./components/AuthForm";
-import { InvestmentList } from "./components/InvestmentList";
-import { InvestmentModal } from "./components/InvestmentModal";
-import { InvestmentStats } from "./components/InvestmentStats";
 import { Layout } from "./components/Layout";
+import { DashboardPage, InvestmentsPage, AssetsPage, UsersPage } from "./pages";
+import { useAuth } from "./contexts/AuthContext";
+import { queryClient } from "./lib/query-client";
+import { Loader2 } from "lucide-react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
-const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState<UserRole>(UserRole.VIEWER);
-  const [currentPath, setCurrentPath] = useState("dashboard");
-  const [investments, setInvestments] =
-    useState<Investment[]>(MOCK_INVESTMENTS);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+const AppContent: React.FC = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const handleLogin = (role: UserRole) => {
-    setUserRole(role);
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserRole(UserRole.VIEWER);
-  };
-
-  const handleSaveInvestment = (data: Omit<Investment, "id" | "updatedAt">) => {
-    if (editingId) {
-      setInvestments((prev) =>
-        prev.map((inv) =>
-          inv.id === editingId
-            ? { ...data, id: editingId, updatedAt: new Date().toISOString() }
-            : inv
-        )
-      );
-    } else {
-      const newInvestment: Investment = {
-        ...data,
-        id: Math.random().toString(36).substring(2, 9),
-        updatedAt: new Date().toISOString(),
-      };
-      setInvestments((prev) => [...prev, newInvestment]);
-    }
-    setEditingId(null);
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this asset?")) {
-      setInvestments((prev) => prev.filter((inv) => inv.id !== id));
-    }
-  };
-
-  const openEditModal = (id: string) => {
-    setEditingId(id);
-    setIsModalOpen(true);
-  };
-
-  const openAddModal = () => {
-    setEditingId(null);
-    setIsModalOpen(true);
-  };
-
-  if (!isAuthenticated) {
-    return <AuthForm onLogin={handleLogin} />;
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      </div>
+    );
   }
 
   return (
-    <>
-      <Layout
-        userRole={userRole}
-        currentPath={currentPath}
-        onNavigate={setCurrentPath}
-        onLogout={handleLogout}
-      >
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            {currentPath === "dashboard"
-              ? "Portfolio Overview"
-              : "Investment Assets"}
-          </h1>
-          <p className="text-slate-400 mt-1">
-            {currentPath === "dashboard"
-              ? "Track performance and allocation across all asset classes."
-              : "Manage your alternative investment entries."}
-          </p>
-        </div>
+    <Routes>
+      {!isAuthenticated ? (
+        <>
+          <Route path="/" element={<AuthForm />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Layout><DashboardPage /></Layout>} />
+          <Route path="/investments" element={<Layout><InvestmentsPage /></Layout>} />
+          <Route path="/assets" element={<Layout><AssetsPage /></Layout>} />
+          <Route path="/users" element={<Layout><UsersPage /></Layout>} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </>
+      )}
+    </Routes>
+  );
+};
 
-        {currentPath === "dashboard" ? (
-          <InvestmentStats investments={investments} />
-        ) : (
-          <InvestmentList
-            investments={investments}
-            userRole={userRole}
-            onDelete={handleDelete}
-            onEdit={openEditModal}
-            onAdd={openAddModal}
-          />
-        )}
-      </Layout>
-
-      <InvestmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveInvestment}
-        initialData={
-          editingId ? investments.find((i) => i.id === editingId) : undefined
-        }
-      />
-    </>
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

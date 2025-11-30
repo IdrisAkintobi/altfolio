@@ -12,12 +12,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Investment } from "../../shared/types";
+import { InvestmentWithAsset } from "../../shared/types";
 import { formatCurrency } from "../lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/Card";
 
 interface InvestmentStatsProps {
-  investments: Investment[];
+  investments: InvestmentWithAsset[];
 }
 
 const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f43f5e", "#10b981"];
@@ -40,17 +40,17 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({
   // Data for Asset Allocation
   const allocationData = Object.values(
     investments.reduce((acc, curr) => {
-      if (!acc[curr.assetType]) {
-        acc[curr.assetType] = { name: curr.assetType, value: 0 };
+      if (!acc[curr.asset.assetType]) {
+        acc[curr.asset.assetType] = { name: curr.asset.assetType, value: 0 };
       }
-      acc[curr.assetType].value += curr.currentValue;
+      acc[curr.asset.assetType].value += curr.currentValue;
       return acc;
     }, {} as Record<string, { name: string; value: number }>)
   );
 
-  // Data for Performance Chart
+  // Data for Performance Chart - show all assets user has invested in
   const performanceData = investments.map((inv) => ({
-    name: inv.assetName,
+    name: inv.asset.assetName,
     invested: inv.investedAmount,
     current: inv.currentValue,
   }));
@@ -117,15 +117,24 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="min-h-[400px]">
-          <CardHeader>
-            <CardTitle>Asset Allocation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+      {investments.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <p className="text-slate-400">
+              No investment data available. Add some investments to see your portfolio analytics.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="min-h-[400px]">
+            <CardHeader>
+              <CardTitle>Asset Allocation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" aspect={2} minHeight={300}>
+                  <PieChart>
                   <Pie
                     data={allocationData}
                     cx="50%"
@@ -153,31 +162,33 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({
                   />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-            <div className="flex flex-wrap gap-4 justify-center mt-4">
-              {allocationData.map(
-                (entry: { name: string; value: number }, index) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span className="text-sm text-slate-400">{entry.name}</span>
-                  </div>
-                )
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+              <div className="flex flex-wrap gap-4 justify-center mt-4">
+                {allocationData.map(
+                  (entry: { name: string; value: number }, index) => (
+                    <div key={entry.name} className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                      />
+                      <span className="text-sm text-slate-400">{entry.name}</span>
+                    </div>
+                  )
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="min-h-[400px]">
+        <Card className="min-h-[400px] flex flex-col">
           <CardHeader>
             <CardTitle>Performance by Asset</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={performanceData}>
+          <CardContent className="flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={performanceData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
+              >
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="#334155"
@@ -185,10 +196,7 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({
                   />
                   <XAxis
                     dataKey="name"
-                    stroke="#94a3b8"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
+                    hide={true}
                   />
                   <YAxis
                     stroke="#94a3b8"
@@ -219,11 +227,11 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({
                     name="Current Value"
                   />
                 </BarChart>
-              </ResponsiveContainer>
-            </div>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

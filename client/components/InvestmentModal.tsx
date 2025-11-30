@@ -1,62 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { Investment, AssetType } from '../../shared/types';
-import { ASSET_TYPES } from '../../shared/constants';
+import { Asset } from '../../shared/types';
 import { Button } from './ui/Button';
-import { X } from 'lucide-react';
+import { X, Loader2, TrendingUp } from 'lucide-react';
+import { useInvestmentsQuery } from '../hooks/queries/useInvestmentsQuery';
+import { formatCurrency } from '../lib/utils';
 
 interface InvestmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (investment: Omit<Investment, 'id' | 'updatedAt'>) => void;
-  initialData?: Investment;
+  onSave: (investment: {
+    assetId: string;
+    investedAmount: number;
+    investmentDate: string;
+  }) => Promise<void>;
+  assets: Asset[];
+  preSelectedAssetId?: string | null;
 }
 
 export const InvestmentModal: React.FC<InvestmentModalProps> = ({ 
   isOpen, 
   onClose, 
   onSave, 
-  initialData 
+  assets,
+  preSelectedAssetId
 }) => {
+  const { data, isLoading, refetch } = useInvestmentsQuery(1, 1000);
+  const investments = data?.data || [];
+  
   const [formData, setFormData] = useState({
-    assetName: '',
-    assetType: AssetType.STARTUP as AssetType,
+    assetId: '',
     investedAmount: 0,
-    currentValue: 0,
     investmentDate: '',
-    owners: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialData) {
+    if (isOpen) {
+      refetch();
       setFormData({
-        assetName: initialData.assetName,
-        assetType: initialData.assetType,
-        investedAmount: initialData.investedAmount,
-        currentValue: initialData.currentValue,
-        investmentDate: initialData.investmentDate.split('T')[0],
-        owners: initialData.owners.join(', '),
-      });
-    } else {
-      setFormData({
-        assetName: '',
-        assetType: AssetType.STARTUP,
+        assetId: preSelectedAssetId || (assets.length > 0 ? assets[0].id : ''),
         investedAmount: 0,
-        currentValue: 0,
         investmentDate: new Date().toISOString().split('T')[0],
-        owners: '',
       });
+      setError(null);
     }
-  }, [initialData, isOpen]);
+  }, [isOpen, assets, preSelectedAssetId, refetch]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const selectedAsset = assets.find(a => a.id === formData.assetId);
+  
+  // Calculate existing investments for this asset
+  const existingInvestments = investments.filter(inv => inv.assetId === formData.assetId);
+  const totalInvested = existingInvestments.reduce((sum, inv) => sum + inv.investedAmount, 0);
+  const totalCurrentValue = existingInvestments.reduce((sum, inv) => sum + inv.currentValue, 0);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...formData,
-      owners: formData.owners.split(',').map(s => s.trim()).filter(Boolean),
-    });
-    onClose();
+    setError(null);
+    setIsSubmitting(true);
+    
+    try {
+      await onSave(formData);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save investment');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -64,7 +76,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-lg">
         <div className="flex items-center justify-between p-6 border-b border-slate-800">
           <h2 className="text-xl font-semibold text-white">
-            {initialData ? 'Edit Investment' : 'New Investment'}
+            Invest in Asset
           </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-white">
             <X className="w-5 h-5" />
@@ -72,30 +84,82 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">Asset Name</label>
-            <input
-              required
-              type="text"
-              value={formData.assetName}
-              onChange={e => setFormData({...formData, assetName: e.target.value})}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Selected Asset Display */}
+          {selectedAsset && (
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{selectedAsset.assetName}</h3>
+                  <p className="text-sm text-slate-400 mt-1">{selectedAsset.assetType}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-slate-400">Current Performance</div>
+                  <div className={`text-lg font-semibold ${
+                    selectedAsset.currentPerformance >= 0 ? 'text-emerald-400' : 'text-red-400'
+                  }`}>
+                    {selectedAsset.currentPerformance >= 0 ? '+' : ''}{selectedAsset.currentPerformance.toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Existing Investments Summary */}
+          {isLoading ? (
+            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4 flex items-center justify-center">
+              <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+              <span className="ml-2 text-sm text-indigo-300">Loading your investments...</span>
+            </div>
+          ) : existingInvestments.length > 0 ? (
+            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-indigo-400" />
+                <h4 className="text-sm font-medium text-indigo-300">Your Existing Investments</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs text-slate-400">Total Invested</div>
+                  <div className="text-lg font-semibold text-white">{formatCurrency(totalInvested)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-400">Current Worth</div>
+                  <div className="text-lg font-semibold text-emerald-400">{formatCurrency(totalCurrentValue)}</div>
+                </div>
+              </div>
+              <div className="mt-2 pt-2 border-t border-indigo-500/20">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">Gain/Loss:</span>
+                  <span className={`font-medium ${
+                    totalCurrentValue - totalInvested >= 0 ? 'text-emerald-400' : 'text-red-400'
+                  }`}>
+                    {totalCurrentValue - totalInvested >= 0 ? '+' : ''}{formatCurrency(totalCurrentValue - totalInvested)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Type</label>
-              <select
-                value={formData.assetType}
-                onChange={e => setFormData({...formData, assetType: e.target.value as AssetType})}
+              <label className="text-sm font-medium text-slate-300">Investment Amount ($)</label>
+              <input
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.investedAmount}
+                onChange={e => setFormData({...formData, investedAmount: Number(e.target.value)})}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+              />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Date Invested</label>
+              <label className="text-sm font-medium text-slate-300">Investment Date</label>
               <input
                 required
                 type="date"
@@ -106,45 +170,16 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Initial Investment ($)</label>
-              <input
-                required
-                type="number"
-                min="0"
-                value={formData.investedAmount}
-                onChange={e => setFormData({...formData, investedAmount: Number(e.target.value)})}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Current Value ($)</label>
-              <input
-                required
-                type="number"
-                min="0"
-                value={formData.currentValue}
-                onChange={e => setFormData({...formData, currentValue: Number(e.target.value)})}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">Owners (Comma separated)</label>
-            <input
-              type="text"
-              placeholder="Alice, Bob"
-              value={formData.owners}
-              onChange={e => setFormData({...formData, owners: e.target.value})}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
 
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-800">
-            <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
-            <Button type="submit">Save Asset</Button>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {existingInvestments.length > 0 ? 'Add to Investment' : 'Create Investment'}
+            </Button>
           </div>
         </form>
       </div>

@@ -35,13 +35,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for stored token and user on mount
     const storedToken = authService.getStoredToken();
     const storedUser = localStorage.getItem('authUser');
-    
+
     if (storedToken && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(parsedUser);
-      } catch (error) {
+      } catch (_error) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
       }
@@ -53,14 +53,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [logout]);
 
   const login = async (email: string, password: string) => {
-    const { user: userData, token: authToken } = await loginMutation.mutateAsync({ email, password });
+    const { user: userData, token: authToken } = await loginMutation.mutateAsync({
+      email,
+      password,
+    });
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('authUser', JSON.stringify(userData));
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const { user: userData, token: authToken } = await registerMutation.mutateAsync({ name, email, password });
+    const { user: userData, token: authToken } = await registerMutation.mutateAsync({
+      name,
+      email,
+      password,
+    });
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('authUser', JSON.stringify(userData));

@@ -1,28 +1,26 @@
-import { NextFunction, Request, Response } from "express";
-import UserModel from "../db/models/User.js";
-import { type User } from "../../shared/types.js";
-import { AppError } from "../utils/app-error.js";
-import { verifyToken } from "../utils/jwt.js";
+import { NextFunction, Request, Response } from 'express';
+import UserModel from '../db/models/User.js';
+import { type User } from '../../shared/types.js';
+import { AppError } from '../utils/app-error.js';
+import { verifyToken } from '../utils/jwt.js';
 
 // Extend Express Request type to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: User;
   }
 }
 
 export const authenticate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw AppError.unauthorized("No token provided");
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw AppError.unauthorized('No token provided');
     }
 
     const token = authHeader.substring(7); // Remove "Bearer " prefix
@@ -33,7 +31,7 @@ export const authenticate = async (
     // Fetch user from database
     const user = await UserModel.findById(decoded.userId);
     if (!user) {
-      throw AppError.unauthorized("User not found");
+      throw AppError.unauthorized('User not found');
     }
 
     // Attach user to request (toObject uses transformDoc to convert _id to id)
@@ -46,7 +44,7 @@ export const authenticate = async (
     } else if (error instanceof Error) {
       next(AppError.unauthorized(error.message));
     } else {
-      next(AppError.unauthorized("Authentication failed"));
+      next(AppError.unauthorized('Authentication failed'));
     }
   }
 };

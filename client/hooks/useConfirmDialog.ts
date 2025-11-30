@@ -19,15 +19,12 @@ export function useConfirmDialog() {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const confirm = useCallback(
-    (options: Omit<ConfirmDialogState, 'isOpen'>) => {
-      setState({
-        isOpen: true,
-        ...options,
-      });
-    },
-    []
-  );
+  const confirm = useCallback((options: Omit<ConfirmDialogState, 'isOpen'>) => {
+    setState({
+      isOpen: true,
+      ...options,
+    });
+  }, []);
 
   const handleConfirm = useCallback(async () => {
     setIsLoading(true);
@@ -39,7 +36,7 @@ export function useConfirmDialog() {
     } finally {
       setIsLoading(false);
     }
-  }, [state.onConfirm]);
+  }, [state]);
 
   const handleClose = useCallback(() => {
     if (!isLoading) {

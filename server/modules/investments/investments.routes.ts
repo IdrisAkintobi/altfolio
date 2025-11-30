@@ -3,7 +3,6 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/authorize.middleware.js';
 import { InvestmentController } from './controllers/investment.controller.js';
 import { CreateInvestmentDto } from './dto/create-investment.dto.js';
-import { UpdateInvestmentDto } from './dto/update-investment.dto.js';
 
 const router = Router();
 const investmentController = new InvestmentController();

@@ -27,10 +27,6 @@ interface CreateInvestmentRequest {
   investmentDate: string;
 }
 
-interface UpdateInvestmentRequest extends CreateInvestmentRequest {
-  id: string;
-}
-
 export const investmentService = {
   async getAll(
     page = 1,
@@ -60,7 +56,10 @@ export const investmentService = {
     return apiClient.post<ApiResponse<InvestmentWithAsset>>('/investments', data);
   },
 
-  async update(id: string, data: CreateInvestmentRequest): Promise<ApiResponse<InvestmentWithAsset>> {
+  async update(
+    id: string,
+    data: CreateInvestmentRequest
+  ): Promise<ApiResponse<InvestmentWithAsset>> {
     return apiClient.put<ApiResponse<InvestmentWithAsset>>(`/investments/${id}`, data);
   },
 

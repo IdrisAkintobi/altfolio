@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { UserRole } from '../../shared/types';
 import { Button } from './ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { Lock, User as UserIcon, AlertCircle, Loader2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
-interface AuthFormProps {
-  onLogin: (role: UserRole) => void;
-}
-
-export const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
+export const AuthForm: React.FC = () => {
+  const { login, register } = useAuth();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -22,31 +19,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onLogin }) => {
     setIsLoading(true);
 
     try {
-      const endpoint = mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
-      const requestBody = mode === 'login'
-        ? { email, password }
-        : { name, email, password };
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        // Handle error response with standard format
-        const errorMessage = result.message || 'Authentication failed';
-        const validationErrors = result.error?.errors?.map((err: any) => err.msg || err.message).join(', ');
-        throw new Error(validationErrors ? `${errorMessage}: ${validationErrors}` : errorMessage);
+      if (mode === 'login') {
+        await login(email, password);
+      } else {
+        await register(name, email, password);
       }
-
-      // Automatically detect role from the backend response
-      onLogin(result.data.role as UserRole);
-      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

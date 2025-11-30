@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { IAsset } from "./Asset.js";
 
 export interface IInvestment extends Document {
   userId: mongoose.Types.ObjectId;
@@ -6,6 +7,11 @@ export interface IInvestment extends Document {
   investedAmount: number;
   investmentDate: Date;
   assetPerformanceAtInvestment: number;
+}
+
+// Type for when assetId is populated
+export interface IInvestmentPopulated extends Omit<IInvestment, 'assetId'> {
+  assetId: IAsset;
 }
 
 const transformDoc = (_doc: any, ret: any) => {

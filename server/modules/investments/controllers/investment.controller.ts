@@ -5,14 +5,19 @@ import {
   AppError,
   asyncHandler,
   parsePaginationParams,
+  logger,
+  AppLogger,
 } from "../../../utils/index.js";
 import { InvestmentService } from "../services/investment.service.js";
 
 export class InvestmentController {
   private readonly investmentService: InvestmentService;
 
+  private readonly logger: AppLogger;
+
   constructor() {
     this.investmentService = new InvestmentService();
+    this.logger = logger.createModuleLogger(InvestmentController.name)
   }
 
   getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -54,8 +59,17 @@ export class InvestmentController {
 
     const investment = await this.investmentService.createInvestment(
       req.body,
-      req.user!
+      req.user
     );
+    const investmentObj = investment.toObject();
+    const asset = investmentObj.assetId as any;
+    
+    this.logger.audit(req, 'CREATE_INVESTMENT', {
+      resource: 'investment',
+      resourceId: investmentObj.id,
+      metadata: { ...req.body },
+    });
+    
     ApiResponse.created(res, investment, "Investment created successfully");
   });
 
@@ -73,12 +87,31 @@ export class InvestmentController {
       id,
       req.body
     );
+    const investmentObj = investment.toObject();
+    
+    this.logger.audit(req, 'UPDATE_INVESTMENT', {
+      resource: 'investment',
+      resourceId: investmentObj.id,
+      changes: Object.keys(req.body),
+      metadata: { ...req.body }
+    });
+    
     ApiResponse.success(res, investment, "Investment updated successfully");
   });
 
   delete = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    await this.investmentService.deleteInvestment(id);
+    const investment = await this.investmentService.deleteInvestment(id);
+    const {id: investmentId, ...data} = investment.toObject();
+    
+    this.logger.audit(req, 'DELETE_INVESTMENT', {
+      resource: 'investment',
+      resourceId: investmentId,
+      metadata: {
+        ...data,
+      },
+    });
+    
     ApiResponse.success(res, null, "Investment deleted successfully");
   });
 }

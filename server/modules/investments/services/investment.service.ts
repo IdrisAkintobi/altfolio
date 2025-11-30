@@ -154,14 +154,20 @@ export class InvestmentService {
     );
 
     if (existingInvestment) {
-      // "Restake" - add to existing investment and reset the performance baseline
-      // This is like withdrawing everything and investing the total at current performance
-      const newTotalAmount = existingInvestment.investedAmount + data.investedAmount;
+      // Calculate current value of existing investment (including gains/losses)
+      const existingCurrentValue = this.calculateCurrentValue(
+        existingInvestment.investedAmount,
+        existingInvestment.assetPerformanceAtInvestment,
+        asset.currentPerformance
+      );
+      
+      // Add new investment to the current value
+      const newTotalAmount = existingCurrentValue + data.investedAmount;
       
       const updated = await this.investmentRepository.update(existingInvestment._id.toString(), {
         investedAmount: newTotalAmount,
-        investmentDate: data.investmentDate, // Update to latest investment date
-        assetPerformanceAtInvestment: asset.currentPerformance, // Reset to current performance
+        investmentDate: data.investmentDate,
+        assetPerformanceAtInvestment: asset.currentPerformance,
       });
       
       if (!updated) {
@@ -193,10 +199,11 @@ export class InvestmentService {
     return investment;
   }
 
-  async deleteInvestment(id: string): Promise<void> {
+  async deleteInvestment(id: string): Promise<IInvestment> {
     const investment = await this.investmentRepository.deleteInvestment(id);
     if (!investment) {
       throw AppError.notFound("Investment not found", { investmentId: id });
     }
+    return investment;
   }
 }

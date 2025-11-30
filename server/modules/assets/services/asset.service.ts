@@ -77,11 +77,12 @@ export class AssetService {
     return asset;
   }
 
-  async deleteAsset(id: string): Promise<void> {
+  async deleteAsset(id: string): Promise<IAsset> {
     const asset = await this.assetRepository.deleteAsset(id);
     if (!asset) {
       throw AppError.notFound("Asset not found", { assetId: id });
     }
+    return asset;
   }
 
   async getAssetPerformanceHistory(

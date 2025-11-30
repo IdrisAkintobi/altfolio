@@ -5,14 +5,19 @@ import {
   AppError,
   asyncHandler,
   parsePaginationParams,
+  logger,
+  AppLogger,
 } from "../../../utils/index.js";
 import { AssetService } from "../services/asset.service.js";
 
 export class AssetController {
   private readonly assetService: AssetService;
 
+  private logger: AppLogger;
+
   constructor() {
     this.assetService = new AssetService();
+    this.logger = logger.createModuleLogger(AssetController.name)
   }
 
   getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
@@ -46,6 +51,14 @@ export class AssetController {
     }
 
     const asset = await this.assetService.createAsset(req.body);
+    const assetObj = asset.toObject();
+    
+    this.logger.audit(req, 'CREATE_ASSET', {
+      resource: 'asset',
+      resourceId: assetObj.id,
+      metadata: { ...req.body },
+    });
+    
     ApiResponse.created(res, asset, "Asset created successfully");
   });
 
@@ -59,6 +72,14 @@ export class AssetController {
 
     const { id } = req.params;
     const asset = await this.assetService.updateAsset(id, req.body);
+    
+    this.logger.audit(req, 'UPDATE_ASSET', {
+      resource: 'asset',
+      resourceId: id,
+      changes: Object.keys(req.body),
+      metadata: { ...req.body },
+    });
+    
     ApiResponse.success(res, asset, "Asset updated successfully");
   });
 
@@ -76,13 +97,31 @@ export class AssetController {
         id,
         req.body
       );
+      
+      this.logger.audit(req, 'UPDATE_ASSET_PERFORMANCE', {
+        resource: 'asset',
+        resourceId: id,
+        metadata: { ...req.body },
+      });
+      
       ApiResponse.success(res, asset, "Asset performance updated successfully");
     }
   );
 
   delete = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    await this.assetService.deleteAsset(id);
+    const asset = await this.assetService.deleteAsset(id);
+    const assetObj = asset.toObject();
+    
+    this.logger.audit(req, 'DELETE_ASSET', {
+      resource: 'asset',
+      resourceId: assetObj.id,
+      metadata: {
+        assetName: assetObj.assetName,
+        assetType: assetObj.assetType,
+      },
+    });
+    
     ApiResponse.success(res, null, "Asset deleted successfully");
   });
 

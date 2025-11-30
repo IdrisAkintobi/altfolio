@@ -1,9 +1,17 @@
 import pino from "pino";
 import { config } from "../config/env.js";
+import { Request } from "express";
 
 export class AppLogger {
   private static instance: AppLogger;
   private readonly logger: pino.Logger;
+
+  private redactEmail(email: string): string {
+    const [localPart, domain] = email.split('@');
+    if (!domain) return '***';
+    const visibleChars = Math.min(2, localPart.length);
+    return `${localPart.substring(0, visibleChars)}***@${domain}`;
+  }
 
   private constructor(existing?: pino.Logger) {
 
@@ -86,6 +94,40 @@ export class AppLogger {
         : { ...meta, error };
 
     this.logger.fatal(errorMeta, message);
+  }
+
+  public audit(
+    req: Request,
+    action: string,
+    data: {
+      resource?: string;
+      resourceId?: string;
+      changes?: string[];
+      metadata?: Record<string, any>;
+    }
+  ): void {
+    const user = req.user;
+    
+    this.logger.info(
+      {
+        audit: true,
+        action,
+        timestamp: new Date().toISOString(),
+        user: {
+          id: user.id,
+          email: this.redactEmail(user.email),
+          role: user.role,
+        },
+        request: {
+          ip: req.ip || req.socket?.remoteAddress,
+          userAgent: req.headers?.['user-agent'],
+          method: req.method,
+          path: req.path,
+        },
+        ...data,
+      },
+      `AUDIT: ${action}`
+    );
   }
 
   private child(bindings: Record<string, any>): AppLogger {

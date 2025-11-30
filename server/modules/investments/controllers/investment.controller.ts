@@ -17,10 +17,19 @@ export class InvestmentController {
 
   getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { page, limit } = parsePaginationParams(req.query);
+    const assetId = req.query.assetId as string | undefined;
+    const userId = req.query.userId as string | undefined;
+    
+    const filters = {
+      ...(assetId && { assetId }),
+      ...(userId && { userId }),
+    };
+    
     const result = await this.investmentService.getAllInvestmentsPaginated(
       req.user,
       page,
-      limit
+      limit,
+      Object.keys(filters).length > 0 ? filters : undefined
     );
     ApiResponse.paginated(res, result, "Investments retrieved successfully");
   });

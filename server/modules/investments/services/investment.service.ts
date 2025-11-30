@@ -81,16 +81,18 @@ export class InvestmentService {
   async getAllInvestmentsPaginated(
     user: User,
     page: number,
-    limit: number
+    limit: number,
+    filters?: { assetId?: string; userId?: string }
   ): Promise<PaginatedResponse<InvestmentWithCalculatedValue>> {
     // Admins can see all investments, regular users see only their own
     const result =
       user.role === "admin"
-        ? await this.investmentRepository.findAllInvestments(page, limit)
+        ? await this.investmentRepository.findAllInvestments(page, limit, filters)
         : await this.investmentRepository.findByUserPaginated(
             user.id,
             page,
-            limit
+            limit,
+            filters ? { assetId: filters.assetId } : undefined
           );
 
     const pagination = createPaginationMeta(page, limit, result.total);

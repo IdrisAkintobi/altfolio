@@ -26,16 +26,26 @@ export class InvestmentRepository extends BaseRepository<IInvestment> {
 
   async findAllInvestments(
     page: number,
-    limit: number
+    limit: number,
+    filters?: { assetId?: string; userId?: string }
   ): Promise<PaginatedInvestments> {
     const skip = (page - 1) * limit;
+    const query: any = {};
+    
+    if (filters?.assetId) {
+      query.assetId = filters.assetId;
+    }
+    if (filters?.userId) {
+      query.userId = filters.userId;
+    }
+
     const [investments, total] = await Promise.all([
-      Investment.find()
+      Investment.find(query)
         .populate("assetId")
         .skip(skip)
         .limit(limit)
         .sort({ investmentDate: -1 }),
-      Investment.countDocuments(),
+      Investment.countDocuments(query),
     ]);
 
     return { investments, total };
@@ -44,10 +54,16 @@ export class InvestmentRepository extends BaseRepository<IInvestment> {
   async findByUserPaginated(
     userId: string,
     page: number,
-    limit: number
+    limit: number,
+    filters?: { assetId?: string }
   ): Promise<PaginatedInvestments> {
     const skip = (page - 1) * limit;
-    const query = { userId };
+    const query: any = { userId };
+    
+    if (filters?.assetId) {
+      query.assetId = filters.assetId;
+    }
+
     const [investments, total] = await Promise.all([
       Investment.find(query)
         .populate("assetId")

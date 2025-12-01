@@ -3,6 +3,7 @@ import { User } from '@shared/types';
 import { authService } from '../services/auth.service';
 import { apiClient } from '../lib/api';
 import { useLogin, useRegister } from '../hooks/mutations/useAuthMutations';
+import { queryClient } from '../lib/query-client';
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setToken(null);
     localStorage.removeItem('authUser');
+    queryClient.clear();
   }, []);
 
   useEffect(() => {

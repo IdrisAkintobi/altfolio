@@ -38,10 +38,10 @@ export const AuthForm: React.FC = () => {
           <div className="mx-auto w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mb-4">
             <Lock className="w-6 h-6 text-white" />
           </div>
-          <CardTitle className="text-2xl">{mode === 'login' ? 'Welcome Back' : 'Create Account'}</CardTitle>
-          <p className="text-slate-400 text-sm mt-2">
-            Enter your credentials to access Altfolio
-          </p>
+          <CardTitle className="text-2xl">
+            {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+          </CardTitle>
+          <p className="text-slate-400 text-sm mt-2">Enter your credentials to access Altfolio</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -54,7 +54,9 @@ export const AuthForm: React.FC = () => {
 
             {mode === 'signup' && (
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-medium text-slate-300">Name</label>
+                <label htmlFor="name" className="text-sm font-medium text-slate-300">
+                  Name
+                </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-2.5 w-5 h-5 text-slate-500" />
                   <input
@@ -85,7 +87,7 @@ export const AuthForm: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">Password</label>
               <div className="relative">
@@ -101,19 +103,13 @@ export const AuthForm: React.FC = () => {
               </div>
             </div>
 
-            {mode === 'signup' && (
-               <p className="text-xs text-slate-500 italic">
-                 Tip: Use an email containing "admin" to get Administrator access.
-               </p>
-            )}
-
             <Button type="submit" className="w-full mt-6" size="lg" disabled={isLoading}>
               {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {mode === 'login' ? 'Sign In' : 'Create Account'}
             </Button>
 
             <div className="text-center mt-4">
-              <button 
+              <button
                 type="button"
                 onClick={() => {
                   setMode(mode === 'login' ? 'signup' : 'login');
@@ -121,7 +117,9 @@ export const AuthForm: React.FC = () => {
                 }}
                 className="text-sm text-indigo-400 hover:text-indigo-300"
               >
-                {mode === 'login' ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+                {mode === 'login'
+                  ? "Don't have an account? Sign up"
+                  : 'Already have an account? Sign in'}
               </button>
             </div>
           </form>

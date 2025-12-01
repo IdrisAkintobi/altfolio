@@ -16,7 +16,7 @@ export const UsersPage: React.FC = () => {
   const limit = 10;
 
   const debouncedSearch = useDebounce(search, 300);
-  const { data, isLoading, error } = useUsersQuery(page, limit, debouncedSearch);
+  const { data, isLoading } = useUsersQuery(page, limit, debouncedSearch);
 
   const users = data?.data || [];
   const total = data?.pagination.total || 0;

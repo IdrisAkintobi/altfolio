@@ -26,7 +26,7 @@
 
 ## Technical
 
-- [ ] Component refactoring
+- [ ] Bundle optimization with code splitting and lazy loading
 - [ ] API documentation (Swagger)
 - [ ] CD pipeline
 - [ ] Monitoring & observability (metrics, health checks, APM)

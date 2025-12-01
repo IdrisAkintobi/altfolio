@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AppError } from './app-error';
-import { config } from '../config/env';
+import { config } from '../config/env.js';
 
 export interface PaginationMeta {
   page: number;

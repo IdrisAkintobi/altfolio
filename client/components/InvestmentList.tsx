@@ -1,5 +1,5 @@
 import React from 'react';
-import { InvestmentWithAsset, UserRole } from '../../shared/types';
+import { InvestmentWithAsset, UserRole } from '@shared/types';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { DropdownMenu } from './ui/DropdownMenu';
 import { Table, Column } from './ui/Table';
@@ -18,8 +18,8 @@ interface InvestmentListProps {
   onPrevPage: () => void;
 }
 
-export const InvestmentList: React.FC<InvestmentListProps> = ({ 
-  investments, 
+export const InvestmentList: React.FC<InvestmentListProps> = ({
+  investments,
   userRole,
   onDelete,
   onView,
@@ -55,7 +55,9 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({
       key: 'currentValue',
       header: 'Current Value',
       align: 'right',
-      render: (inv) => <span className="text-white font-medium">{formatCurrency(inv.currentValue)}</span>,
+      render: (inv) => (
+        <span className="text-white font-medium">{formatCurrency(inv.currentValue)}</span>
+      ),
     },
     {
       key: 'gainLoss',
@@ -66,7 +68,8 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({
         const isPositive = gain >= 0;
         return (
           <span className={`font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-            {isPositive ? '+' : ''}{formatCurrency(gain)}
+            {isPositive ? '+' : ''}
+            {formatCurrency(gain)}
           </span>
         );
       },
@@ -84,17 +87,25 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({
         <div className="flex items-center justify-end">
           <DropdownMenu
             items={[
-              ...(onView ? [{
-                label: 'View Details',
-                icon: <Eye className="w-4 h-4" />,
-                onClick: () => onView(inv),
-              }] : []),
-              ...(userRole === UserRole.ADMIN ? [{
-                label: 'Delete',
-                icon: <Trash2 className="w-4 h-4" />,
-                onClick: () => onDelete(inv.id),
-                className: 'text-red-400',
-              }] : []),
+              ...(onView
+                ? [
+                    {
+                      label: 'View Details',
+                      icon: <Eye className="w-4 h-4" />,
+                      onClick: () => onView(inv),
+                    },
+                  ]
+                : []),
+              ...(userRole === UserRole.ADMIN
+                ? [
+                    {
+                      label: 'Delete',
+                      icon: <Trash2 className="w-4 h-4" />,
+                      onClick: () => onDelete(inv.id),
+                      className: 'text-red-400',
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>

@@ -1,12 +1,12 @@
-import { faker } from "@faker-js/faker";
-import argon2 from "argon2";
-import mongoose from "mongoose";
-import { AssetType, UserRole } from "../../shared/types";
-import { connectDB } from "./connection";
-import Asset from "./models/Asset";
-import AssetPerformanceHistory from "./models/AssetPerformanceHistory";
-import Investment from "./models/Investment";
-import User from "./models/User";
+import { faker } from '@faker-js/faker';
+import argon2 from 'argon2';
+import mongoose from 'mongoose';
+import { AssetType, UserRole } from '@shared/types';
+import { connectDB } from './connection';
+import Asset from './models/Asset';
+import AssetPerformanceHistory from './models/AssetPerformanceHistory';
+import Investment from './models/Investment';
+import User from './models/User';
 
 const NUM_USERS = 30;
 const NUM_ASSETS = 100;
@@ -14,105 +14,105 @@ const NUM_INVESTMENTS = 500;
 const NUM_PERFORMANCE_UPDATES_PER_ASSET = 10;
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
-const DEFAULT_ADMIN_NAME = "Admin User";
-const DEFAULT_ADMIN_EMAIL = "admin@altfolio.com";
-const DEFAULT_ADMIN_PASSWORD = "admin123";
-const USERS_PASSWORD = "password123";
+const DEFAULT_ADMIN_NAME = 'Admin User';
+const DEFAULT_ADMIN_EMAIL = 'admin@altfolio.com';
+const DEFAULT_ADMIN_PASSWORD = 'admin123';
+const USERS_PASSWORD = 'password123';
 
 const assetTypes = Object.values(AssetType);
 
 // Asset names by type for more realistic data
 const assetNamesByType: Record<string, string[]> = {
   [AssetType.STARTUP]: [
-    "TechVenture AI",
-    "CloudSync Solutions",
-    "HealthTech Innovations",
-    "FinanceFlow App",
-    "EduLearn Platform",
-    "GreenEnergy Systems",
-    "FoodTech Delivery",
-    "SmartHome Devices",
-    "CyberSec Pro",
-    "DataAnalytics Plus",
-    "BioTech Labs",
-    "RoboticsCo",
-    "SpaceTech Ventures",
-    "MediaStream Inc",
-    "SocialConnect App",
-    "EcoFriendly Products",
-    "MobilePay Solutions",
-    "VirtualReality World",
-    "BlockchainPro",
-    "AgriTech Farms",
+    'TechVenture AI',
+    'CloudSync Solutions',
+    'HealthTech Innovations',
+    'FinanceFlow App',
+    'EduLearn Platform',
+    'GreenEnergy Systems',
+    'FoodTech Delivery',
+    'SmartHome Devices',
+    'CyberSec Pro',
+    'DataAnalytics Plus',
+    'BioTech Labs',
+    'RoboticsCo',
+    'SpaceTech Ventures',
+    'MediaStream Inc',
+    'SocialConnect App',
+    'EcoFriendly Products',
+    'MobilePay Solutions',
+    'VirtualReality World',
+    'BlockchainPro',
+    'AgriTech Farms',
   ],
   [AssetType.CRYPTO_FUND]: [
-    "Bitcoin Growth Fund",
-    "Ethereum Alpha Fund",
-    "DeFi Opportunities Fund",
-    "Crypto Diversified Portfolio",
-    "Digital Assets Fund",
-    "Blockchain Ventures Fund",
-    "Altcoin Strategic Fund",
-    "Web3 Innovation Fund",
-    "NFT & Metaverse Fund",
-    "Crypto Hedge Fund",
-    "Stablecoin Plus Fund",
-    "DeFi Yield Fund",
-    "Layer 2 Solutions Fund",
-    "GameFi Investment Fund",
-    "Smart Contract Fund",
+    'Bitcoin Growth Fund',
+    'Ethereum Alpha Fund',
+    'DeFi Opportunities Fund',
+    'Crypto Diversified Portfolio',
+    'Digital Assets Fund',
+    'Blockchain Ventures Fund',
+    'Altcoin Strategic Fund',
+    'Web3 Innovation Fund',
+    'NFT & Metaverse Fund',
+    'Crypto Hedge Fund',
+    'Stablecoin Plus Fund',
+    'DeFi Yield Fund',
+    'Layer 2 Solutions Fund',
+    'GameFi Investment Fund',
+    'Smart Contract Fund',
   ],
   [AssetType.FARMLAND]: [
-    "Midwest Corn Fields",
-    "California Vineyards",
-    "Organic Farm Holdings",
-    "Sustainable Agriculture Land",
-    "Texas Ranch Properties",
-    "Midwest Soybean Farms",
-    "Oregon Fruit Orchards",
-    "Florida Citrus Groves",
-    "Iowa Agricultural Land",
-    "Montana Cattle Ranch",
-    "Washington Apple Orchards",
-    "Vermont Dairy Farms",
-    "Kansas Wheat Fields",
-    "Georgia Pecan Groves",
-    "Pennsylvania Farmland",
+    'Midwest Corn Fields',
+    'California Vineyards',
+    'Organic Farm Holdings',
+    'Sustainable Agriculture Land',
+    'Texas Ranch Properties',
+    'Midwest Soybean Farms',
+    'Oregon Fruit Orchards',
+    'Florida Citrus Groves',
+    'Iowa Agricultural Land',
+    'Montana Cattle Ranch',
+    'Washington Apple Orchards',
+    'Vermont Dairy Farms',
+    'Kansas Wheat Fields',
+    'Georgia Pecan Groves',
+    'Pennsylvania Farmland',
   ],
   [AssetType.COLLECTIBLE]: [
-    "Vintage Baseball Cards",
-    "Rare Comic Books",
-    "Classic Car Collection",
-    "Fine Art Portfolio",
-    "Antique Furniture",
-    "Limited Edition Watches",
-    "Rare Coins Collection",
-    "Vintage Wine Collection",
-    "Historical Manuscripts",
-    "Designer Handbags",
-    "Vintage Vinyl Records",
-    "Sports Memorabilia",
-    "Rare Stamps Collection",
-    "Antique Jewelry",
-    "Collector Sneakers",
-    "Fine Whiskey Collection",
+    'Vintage Baseball Cards',
+    'Rare Comic Books',
+    'Classic Car Collection',
+    'Fine Art Portfolio',
+    'Antique Furniture',
+    'Limited Edition Watches',
+    'Rare Coins Collection',
+    'Vintage Wine Collection',
+    'Historical Manuscripts',
+    'Designer Handbags',
+    'Vintage Vinyl Records',
+    'Sports Memorabilia',
+    'Rare Stamps Collection',
+    'Antique Jewelry',
+    'Collector Sneakers',
+    'Fine Whiskey Collection',
   ],
   [AssetType.OTHER]: [
-    "Precious Metals Portfolio",
-    "Commodity Index Fund",
-    "Real Estate Crowdfunding",
-    "Private Equity Fund",
-    "Venture Debt Fund",
-    "Infrastructure Fund",
-    "Music Royalties",
-    "Film Production Rights",
-    "Patent Portfolio",
-    "Domain Name Portfolio",
-    "Timber Investment",
-    "Water Rights",
-    "Carbon Credits",
-    "Renewable Energy Credits",
-    "Intellectual Property Rights",
+    'Precious Metals Portfolio',
+    'Commodity Index Fund',
+    'Real Estate Crowdfunding',
+    'Private Equity Fund',
+    'Venture Debt Fund',
+    'Infrastructure Fund',
+    'Music Royalties',
+    'Film Production Rights',
+    'Patent Portfolio',
+    'Domain Name Portfolio',
+    'Timber Investment',
+    'Water Rights',
+    'Carbon Credits',
+    'Renewable Energy Credits',
+    'Intellectual Property Rights',
   ],
 };
 
@@ -187,16 +187,16 @@ const createAssets = async (): Promise<mongoose.Types.ObjectId[]> => {
   }
 
   const createdAssets = await Asset.insertMany(assets);
-  const listedCount = createdAssets.filter(a => a.isListed).length;
+  const listedCount = createdAssets.filter((a) => a.isListed).length;
   const unlistedCount = createdAssets.length - listedCount;
-  console.log(`✓ Created ${createdAssets.length} assets (${listedCount} listed, ${unlistedCount} unlisted)`);
+  console.log(
+    `✓ Created ${createdAssets.length} assets (${listedCount} listed, ${unlistedCount} unlisted)`
+  );
 
   return createdAssets.map((asset) => asset._id as mongoose.Types.ObjectId);
 };
 
-const createPerformanceHistory = async (
-  assetIds: mongoose.Types.ObjectId[]
-): Promise<void> => {
+const createPerformanceHistory = async (assetIds: mongoose.Types.ObjectId[]): Promise<void> => {
   const historyEntries = [];
 
   for (const assetId of assetIds) {
@@ -292,10 +292,7 @@ const createInvestments = async (
     // Get asset performance at the time of investment
     // Should be less than current performance (investment was made before current state)
     const minPerformance = -50;
-    const maxPerformance = Math.max(
-      minPerformance + 1,
-      asset.currentPerformance - 5
-    );
+    const maxPerformance = Math.max(minPerformance + 1, asset.currentPerformance - 5);
     const assetPerformanceAtInvestment = faker.number.float({
       min: minPerformance,
       max: maxPerformance,
@@ -317,46 +314,44 @@ const createInvestments = async (
 
 const seed = async (): Promise<void> => {
   try {
-    console.log("🌱 Starting database seeding...\n");
+    console.log('🌱 Starting database seeding...\n');
 
     // Connect to database
     await connectDB();
-    console.log("✓ Connected to database\n");
+    console.log('✓ Connected to database\n');
 
     // Clear existing data
-    console.log("Clearing existing data...");
+    console.log('Clearing existing data...');
     await User.deleteMany({});
     await Asset.deleteMany({});
     await AssetPerformanceHistory.deleteMany({});
     await Investment.deleteMany({});
-    console.log("✓ Cleared existing data\n");
+    console.log('✓ Cleared existing data\n');
 
     // Create seed data
-    console.log("Creating seed data...");
+    console.log('Creating seed data...');
     const userIds = await createUsers();
     const assetIds = await createAssets();
     await createPerformanceHistory(assetIds);
     await createInvestments(userIds, assetIds);
 
     // Print summary
-    console.log("\n✅ Seeding completed successfully!\n");
-    console.log("Summary:");
+    console.log('\n✅ Seeding completed successfully!\n');
+    console.log('Summary:');
     console.log(`- Users created: ${NUM_USERS}`);
     console.log(`- Assets created: ${NUM_ASSETS}`);
     console.log(
-      `- Performance history entries: ~${
-        NUM_ASSETS * (NUM_PERFORMANCE_UPDATES_PER_ASSET + 2)
-      }`
+      `- Performance history entries: ~${NUM_ASSETS * (NUM_PERFORMANCE_UPDATES_PER_ASSET + 2)}`
     );
     console.log(`- Investments created: ${NUM_INVESTMENTS}`);
-    console.log("\nDefault admin credentials:");
+    console.log('\nDefault admin credentials:');
     console.log(`Email: ${DEFAULT_ADMIN_EMAIL}`);
     console.log(`Password: ${DEFAULT_ADMIN_PASSWORD}`);
     console.log(`\nOther users password: ${USERS_PASSWORD}\n`);
 
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error seeding database:", error);
+    console.error('❌ Error seeding database:', error);
     process.exit(1);
   }
 };

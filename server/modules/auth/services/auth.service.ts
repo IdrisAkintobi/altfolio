@@ -1,8 +1,8 @@
-import argon2 from "argon2";
-import { type User } from "../../../../shared/types.js";
-import { AppError } from "../../../utils/index.js";
-import { generateToken } from "../../../utils/jwt.js";
-import { UserRepository } from "../../../db/repositories/user.repository.js";
+import argon2 from 'argon2';
+import { type User } from '@shared/types';
+import { AppError } from '../../../utils/index.js';
+import { generateToken } from '../../../utils/jwt.js';
+import { UserRepository } from '../../../db/repositories/user.repository.js';
 
 export interface RegisterData {
   name?: string;
@@ -19,7 +19,7 @@ export interface AuthResponse {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "viewer";
+  role: 'admin' | 'viewer';
   token: string;
 }
 
@@ -34,8 +34,8 @@ export class AuthService {
     // Check if user exists
     const existingUser = await this.userRepository.findByEmail(data.email);
     if (existingUser) {
-      throw AppError.conflict("User already exists", {
-        field: "email",
+      throw AppError.conflict('User already exists', {
+        field: 'email',
         value: data.email,
       });
     }
@@ -57,16 +57,13 @@ export class AuthService {
     // Find user
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) {
-      throw AppError.unauthorized("Invalid email or password");
+      throw AppError.unauthorized('Invalid email or password');
     }
 
     // Verify password with Argon2
-    const isValidPassword = await argon2.verify(
-      user.passwordHash,
-      data.password
-    );
+    const isValidPassword = await argon2.verify(user.passwordHash, data.password);
     if (!isValidPassword) {
-      throw AppError.unauthorized("Invalid email or password");
+      throw AppError.unauthorized('Invalid email or password');
     }
 
     return await this.generateAuthResponse(user.toObject());

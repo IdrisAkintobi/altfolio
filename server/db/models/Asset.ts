@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { AssetType } from "../../../shared/types";
+import mongoose, { Document, Schema } from 'mongoose';
+import { AssetType } from '@shared/types';
 
 export interface IAsset extends Document {
   assetName: string;
@@ -28,7 +28,7 @@ const AssetSchema: Schema = new Schema(
       type: Number,
       required: true,
       default: 0,
-      comment: "Percentage change from initial value",
+      comment: 'Percentage change from initial value',
     },
     lastUpdated: { type: Date, required: true, default: Date.now },
     isListed: { type: Boolean, required: true, default: true },
@@ -44,4 +44,4 @@ const AssetSchema: Schema = new Schema(
 AssetSchema.index({ assetType: 1 });
 AssetSchema.index({ assetName: 1 });
 
-export default mongoose.model<IAsset>("Asset", AssetSchema);
+export default mongoose.model<IAsset>('Asset', AssetSchema);

@@ -7,17 +7,17 @@ import { SearchInput } from '../components/ui/SearchInput';
 import { DropdownMenu } from '../components/ui/DropdownMenu';
 import { useDebounce } from '../hooks/useDebounce';
 import { useUsersQuery } from '../hooks/queries/useUsersQuery';
-import { User } from '../../shared/types';
+import { User } from '@shared/types';
 
 export const UsersPage: React.FC = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const limit = 10;
-  
+
   const debouncedSearch = useDebounce(search, 300);
   const { data, isLoading, error } = useUsersQuery(page, limit, debouncedSearch);
-  
+
   const users = data?.data || [];
   const total = data?.pagination.total || 0;
   const totalPages = data?.pagination.totalPages || 0;
@@ -46,11 +46,13 @@ export const UsersPage: React.FC = () => {
       key: 'role',
       header: 'Role',
       render: (user) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-          user.role === 'admin' 
-            ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-            : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-        }`}>
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+            user.role === 'admin'
+              ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+              : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+          }`}
+        >
           {user.role}
         </span>
       ),
@@ -58,7 +60,11 @@ export const UsersPage: React.FC = () => {
     {
       key: 'createdAt',
       header: 'Joined',
-      render: (user) => <span className="text-slate-400">{user.createdAt ? formatDate(user.createdAt) : 'N/A'}</span>,
+      render: (user) => (
+        <span className="text-slate-400">
+          {user.createdAt ? formatDate(user.createdAt) : 'N/A'}
+        </span>
+      ),
     },
     {
       key: 'actions',
@@ -101,18 +107,12 @@ export const UsersPage: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Users
-            </h1>
-            <p className="text-slate-400 mt-1">
-              Manage platform users and their roles.
-            </p>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Users</h1>
+            <p className="text-slate-400 mt-1">Manage platform users and their roles.</p>
           </div>
-          <div className="text-sm text-slate-400">
-            Total: {total} users
-          </div>
+          <div className="text-sm text-slate-400">Total: {total} users</div>
         </div>
-        
+
         <SearchInput
           value={search}
           onChange={handleSearch}

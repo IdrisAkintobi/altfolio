@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../../lib/query-keys';
 import { apiClient } from '../../lib/api';
-import { User } from '../../../shared/types';
+import { User } from '@shared/types';
 
 export function useUsersQuery(page: number, limit: number, search: string) {
   return useQuery({

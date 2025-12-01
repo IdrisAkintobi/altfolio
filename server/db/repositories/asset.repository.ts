@@ -1,9 +1,9 @@
-import Asset, { IAsset } from "../models/Asset.js";
+import Asset, { IAsset } from '../models/Asset.js';
 import AssetPerformanceHistory, {
   IAssetPerformanceHistory,
-} from "../models/AssetPerformanceHistory.js";
-import { type AssetType } from "../../../shared/types.js";
-import { BaseRepository } from "./base.repository.js";
+} from '../models/AssetPerformanceHistory.js';
+import { type AssetType } from '@shared/types';
+import { BaseRepository } from './base.repository.js';
 
 export interface AssetData {
   assetName: string;
@@ -34,10 +34,10 @@ export class AssetRepository extends BaseRepository<IAsset> {
     const query: any = {};
 
     if (search) {
-      query.assetName = { $regex: search, $options: "i" };
+      query.assetName = { $regex: search, $options: 'i' };
     }
 
-    if (assetType && assetType !== "All") {
+    if (assetType && assetType !== 'All') {
       query.assetType = assetType;
     }
 
@@ -73,17 +73,11 @@ export class AssetRepository extends BaseRepository<IAsset> {
     });
   }
 
-  async updateAsset(
-    id: string,
-    data: Partial<AssetData>
-  ): Promise<IAsset | null> {
+  async updateAsset(id: string, data: Partial<AssetData>): Promise<IAsset | null> {
     return await this.update(id, { ...data, lastUpdated: new Date() });
   }
 
-  async updatePerformance(
-    id: string,
-    percentageChange: number
-  ): Promise<IAsset | null> {
+  async updatePerformance(id: string, percentageChange: number): Promise<IAsset | null> {
     return await this.withTransaction(async (session) => {
       const asset = await Asset.findByIdAndUpdate(
         id,
@@ -118,11 +112,9 @@ export class AssetRepository extends BaseRepository<IAsset> {
         return null;
       }
 
-      const Investment = (await import("../models/Investment.js")).default;
+      const Investment = (await import('../models/Investment.js')).default;
 
-      await AssetPerformanceHistory.deleteMany({ assetId: id }).session(
-        session
-      );
+      await AssetPerformanceHistory.deleteMany({ assetId: id }).session(session);
       await Investment.deleteMany({ assetId: id }).session(session);
       await asset.deleteOne({ session });
 

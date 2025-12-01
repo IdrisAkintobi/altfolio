@@ -1,5 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { type User, UserRole } from "../../../shared/types";
+import mongoose, { Document, Schema } from 'mongoose';
+import { type User, UserRole } from '@shared/types';
 
 export interface IUser extends Document {
   email: string;
@@ -31,4 +31,4 @@ const UserSchema: Schema = new Schema(
   }
 );
 
-export default mongoose.model<IUser>("User", UserSchema);
+export default mongoose.model<IUser>('User', UserSchema);

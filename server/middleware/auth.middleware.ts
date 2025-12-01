@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import UserModel from '../db/models/User.js';
-import { type User } from '../../shared/types.js';
+import { type User } from '@shared/types';
 import { AppError } from '../utils/app-error.js';
 import { verifyToken } from '../utils/jwt.js';
 

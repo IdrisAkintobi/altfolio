@@ -1,26 +1,26 @@
-import { body, ValidationChain } from "express-validator";
-import { AssetType } from "../../../../shared/types.js";
+import { body, ValidationChain } from 'express-validator';
+import { AssetType } from '@shared/types';
 
 export class CreateAssetDto {
   static validate(): ValidationChain[] {
     return [
-      body("assetName")
+      body('assetName')
         .trim()
         .notEmpty()
-        .withMessage("Asset name is required")
+        .withMessage('Asset name is required')
         .isLength({ min: 2, max: 100 })
-        .withMessage("Asset name must be between 2 and 100 characters"),
+        .withMessage('Asset name must be between 2 and 100 characters'),
 
-      body("assetType")
+      body('assetType')
         .notEmpty()
-        .withMessage("Asset type is required")
+        .withMessage('Asset type is required')
         .isIn(Object.values(AssetType))
-        .withMessage("Invalid asset type"),
+        .withMessage('Invalid asset type'),
 
-      body("currentPerformance")
+      body('currentPerformance')
         .optional()
         .isFloat()
-        .withMessage("Current performance must be a number")
+        .withMessage('Current performance must be a number')
         .toFloat(),
     ];
   }

@@ -1,6 +1,15 @@
 import React from 'react';
-import { InvestmentWithAsset } from '../../shared/types';
-import { X, User as UserIcon, Mail, Calendar, DollarSign, TrendingUp, Briefcase, Loader2 } from 'lucide-react';
+import { InvestmentWithAsset } from '@shared/types';
+import {
+  X,
+  User as UserIcon,
+  Mail,
+  Calendar,
+  DollarSign,
+  TrendingUp,
+  Briefcase,
+  Loader2,
+} from 'lucide-react';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { useUserQuery } from '../hooks/queries/useUsersQuery';
 
@@ -20,11 +29,11 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
   // userId might be populated as an object or just a string ID
   const userId = investment?.userId;
   const userIdString = typeof userId === 'string' ? userId : (userId as any)?.id || '';
-  
+
   const { data: user, isLoading: isLoadingUser } = useUserQuery(
     isAdmin && userIdString ? userIdString : ''
   );
-  
+
   // If userId is already populated, use it directly
   const populatedUser = typeof userId === 'object' ? userId : null;
 
@@ -54,18 +63,25 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-slate-400">Asset Name</div>
-                <div className="text-sm font-medium text-white mt-1">{investment.asset.assetName}</div>
+                <div className="text-sm font-medium text-white mt-1">
+                  {investment.asset.assetName}
+                </div>
               </div>
               <div>
                 <div className="text-xs text-slate-400">Asset Type</div>
-                <div className="text-sm font-medium text-white mt-1">{investment.asset.assetType}</div>
+                <div className="text-sm font-medium text-white mt-1">
+                  {investment.asset.assetType}
+                </div>
               </div>
               <div>
                 <div className="text-xs text-slate-400">Current Performance</div>
-                <div className={`text-sm font-medium mt-1 ${
-                  investment.asset.currentPerformance >= 0 ? 'text-emerald-400' : 'text-red-400'
-                }`}>
-                  {investment.asset.currentPerformance >= 0 ? '+' : ''}{investment.asset.currentPerformance.toFixed(2)}%
+                <div
+                  className={`text-sm font-medium mt-1 ${
+                    investment.asset.currentPerformance >= 0 ? 'text-emerald-400' : 'text-red-400'
+                  }`}
+                >
+                  {investment.asset.currentPerformance >= 0 ? '+' : ''}
+                  {investment.asset.currentPerformance.toFixed(2)}%
                 </div>
               </div>
               <div>
@@ -98,8 +114,12 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
               </div>
               <div>
                 <div className="text-xs text-slate-400">Gain/Loss</div>
-                <div className={`text-lg font-semibold mt-1 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {isPositive ? '+' : ''}{formatCurrency(gain)} ({isPositive ? '+' : ''}{gainPercentage}%)
+                <div
+                  className={`text-lg font-semibold mt-1 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}
+                >
+                  {isPositive ? '+' : ''}
+                  {formatCurrency(gain)} ({isPositive ? '+' : ''}
+                  {gainPercentage}%)
                 </div>
               </div>
               <div>
@@ -133,11 +153,13 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-slate-400">Role:</span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
-                      (populatedUser as any).role === 'admin' 
-                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                        : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                        (populatedUser as any).role === 'admin'
+                          ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                          : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                      }`}
+                    >
                       {(populatedUser as any).role}
                     </span>
                   </div>
@@ -145,7 +167,9 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="w-4 h-4 text-slate-400" />
                       <span className="text-slate-400">Joined:</span>
-                      <span className="text-white">{formatDate((populatedUser as any).createdAt)}</span>
+                      <span className="text-white">
+                        {formatDate((populatedUser as any).createdAt)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -167,11 +191,13 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-slate-400">Role:</span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
-                      user.role === 'admin' 
-                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                        : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+                        user.role === 'admin'
+                          ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                          : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                      }`}
+                    >
                       {user.role}
                     </span>
                   </div>
@@ -196,18 +222,19 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
               <h3 className="text-sm font-semibold text-indigo-300">Performance Summary</h3>
             </div>
             <p className="text-sm text-slate-300">
-              This investment has {isPositive ? 'gained' : 'lost'} {' '}
+              This investment has {isPositive ? 'gained' : 'lost'}{' '}
               <span className={`font-semibold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                 {Math.abs(parseFloat(gainPercentage))}%
-              </span>
-              {' '}since the investment date. The asset's performance has changed from{' '}
+              </span>{' '}
+              since the investment date. The asset's performance has changed from{' '}
               <span className="font-semibold text-white">
                 {investment.assetPerformanceAtInvestment.toFixed(2)}%
-              </span>
-              {' '}to{' '}
+              </span>{' '}
+              to{' '}
               <span className="font-semibold text-white">
                 {investment.asset.currentPerformance.toFixed(2)}%
-              </span>.
+              </span>
+              .
             </p>
           </div>
         </div>

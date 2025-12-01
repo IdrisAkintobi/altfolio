@@ -1,13 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Asset, UserRole } from '../../shared/types';
+import { Asset, UserRole } from '@shared/types';
 import { formatDate } from '../lib/utils';
 import { Button } from './ui/Button';
 import { DropdownMenu } from './ui/DropdownMenu';
 import { Table, Column } from './ui/Table';
 import { SearchInput } from './ui/SearchInput';
-import { Plus, Trash2, Edit2, TrendingUp, TrendingDown, Eye, CheckCircle, XCircle } from 'lucide-react';
-import { ASSET_TYPES } from '../../shared/constants';
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  TrendingUp,
+  TrendingDown,
+  Eye,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
+import { ASSET_TYPES } from '@shared/constants';
 
 interface AssetListProps {
   assets: Asset[];
@@ -29,9 +38,9 @@ interface AssetListProps {
   onPrevPage: () => void;
 }
 
-export const AssetList: React.FC<AssetListProps> = ({ 
-  assets, 
-  userRole, 
+export const AssetList: React.FC<AssetListProps> = ({
+  assets,
+  userRole,
   onDelete,
   onEdit,
   onAdd,
@@ -57,9 +66,7 @@ export const AssetList: React.FC<AssetListProps> = ({
       render: (asset) => (
         <span className="font-medium text-white">
           {asset.assetName}
-          {!asset.isListed && (
-            <span className="ml-2 text-xs text-yellow-400">(Unlisted)</span>
-          )}
+          {!asset.isListed && <span className="ml-2 text-xs text-yellow-400">(Unlisted)</span>}
         </span>
       ),
     },
@@ -79,9 +86,12 @@ export const AssetList: React.FC<AssetListProps> = ({
       render: (asset) => {
         const isPositive = asset.currentPerformance >= 0;
         return (
-          <div className={`flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+          <div
+            className={`flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}
+          >
             {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-            {isPositive ? '+' : ''}{asset.currentPerformance.toFixed(2)}%
+            {isPositive ? '+' : ''}
+            {asset.currentPerformance.toFixed(2)}%
           </div>
         );
       },
@@ -116,7 +126,11 @@ export const AssetList: React.FC<AssetListProps> = ({
                 },
                 {
                   label: asset.isListed ? 'Unlist' : 'List',
-                  icon: asset.isListed ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />,
+                  icon: asset.isListed ? (
+                    <XCircle className="w-4 h-4" />
+                  ) : (
+                    <CheckCircle className="w-4 h-4" />
+                  ),
                   onClick: () => onToggleListed(asset.id, asset.isListed),
                   className: asset.isListed ? 'text-yellow-400' : 'text-green-400',
                 },
@@ -141,18 +155,18 @@ export const AssetList: React.FC<AssetListProps> = ({
           Showing {assets.length} of {total} assets
         </div>
         <div className="flex items-center gap-4 flex-1 w-full md:w-auto">
-          <SearchInput
-            value={search}
-            onChange={onSearch}
-            placeholder="Search by asset name..."
-          />
+          <SearchInput value={search} onChange={onSearch} placeholder="Search by asset name..." />
           <select
             value={assetType}
             onChange={(e) => onTypeFilter(e.target.value)}
             className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="All">All Types</option>
-            {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            {ASSET_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
           </select>
         </div>
 

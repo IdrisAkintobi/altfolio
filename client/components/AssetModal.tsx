@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Asset, AssetType } from '../../shared/types';
-import { ASSET_TYPES } from '../../shared/constants';
+import { Asset, AssetType } from '@shared/types';
+import { ASSET_TYPES } from '@shared/constants';
 import { Button } from './ui/Button';
 import { X, Loader2 } from 'lucide-react';
 
@@ -15,12 +15,7 @@ interface AssetModalProps {
   initialData?: Asset;
 }
 
-export const AssetModal: React.FC<AssetModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSave, 
-  initialData 
-}) => {
+export const AssetModal: React.FC<AssetModalProps> = ({ isOpen, onClose, onSave, initialData }) => {
   const [formData, setFormData] = useState({
     assetName: '',
     assetType: AssetType.STARTUP as AssetType,
@@ -52,7 +47,7 @@ export const AssetModal: React.FC<AssetModalProps> = ({
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-    
+
     try {
       await onSave(formData);
       onClose();
@@ -74,7 +69,7 @@ export const AssetModal: React.FC<AssetModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">
@@ -88,7 +83,7 @@ export const AssetModal: React.FC<AssetModalProps> = ({
               required
               type="text"
               value={formData.assetName}
-              onChange={e => setFormData({...formData, assetName: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, assetName: e.target.value })}
               className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="e.g., SpaceX Series N"
             />
@@ -98,29 +93,31 @@ export const AssetModal: React.FC<AssetModalProps> = ({
             <label className="text-sm font-medium text-slate-300">Asset Type</label>
             <select
               value={formData.assetType}
-              onChange={e => setFormData({...formData, assetType: e.target.value as AssetType})}
+              onChange={(e) => setFormData({ ...formData, assetType: e.target.value as AssetType })}
               className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              {ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              {ASSET_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">
-              Current Performance (%)
-            </label>
+            <label className="text-sm font-medium text-slate-300">Current Performance (%)</label>
             <input
               required
               type="number"
               step="0.01"
               value={formData.currentPerformance}
-              onChange={e => setFormData({...formData, currentPerformance: Number(e.target.value)})}
+              onChange={(e) =>
+                setFormData({ ...formData, currentPerformance: Number(e.target.value) })
+              }
               className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="e.g., 25.5"
             />
-            <p className="text-xs text-slate-500">
-              Positive for gains, negative for losses
-            </p>
+            <p className="text-xs text-slate-500">Positive for gains, negative for losses</p>
           </div>
 
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-800">

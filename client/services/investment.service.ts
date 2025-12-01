@@ -1,4 +1,4 @@
-import { InvestmentWithAsset } from '../../shared/types';
+import { InvestmentWithAsset } from '@shared/types';
 import { apiClient } from '../lib/api';
 
 interface PaginatedResponse<T> {

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User } from '../../shared/types';
+import { User } from '@shared/types';
 import { authService } from '../services/auth.service';
 import { apiClient } from '../lib/api';
 import { useLogin, useRegister } from '../hooks/mutations/useAuthMutations';

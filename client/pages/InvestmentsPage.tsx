@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { UserRole, InvestmentWithAsset } from '../../shared/types';
+import { UserRole, InvestmentWithAsset } from '@shared/types';
 import { InvestmentList } from '../components/InvestmentList';
 import { InvestmentDetailsModal } from '../components/InvestmentDetailsModal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -19,34 +19,34 @@ export const InvestmentsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const [selectedInvestment, setSelectedInvestment] = useState<InvestmentWithAsset | null>(null);
-  
+
   const assetId = searchParams.get('assetId') || undefined;
   const userId = searchParams.get('userId') || undefined;
-  
+
   const filters = {
     ...(assetId && { assetId }),
     ...(userId && { userId }),
   };
-  
+
   const { data, isLoading } = useInvestmentsQuery(
     page,
     limit,
     Object.keys(filters).length > 0 ? filters : undefined
   );
-  
+
   // Fetch user and asset data for filter display
   const { data: filterUser } = useUserQuery(userId || '');
   const { data: filterAssetData } = useAssetQuery(assetId || '');
   const filterAsset = filterAssetData?.data;
-  
+
   const deleteInvestmentMutation = useDeleteInvestment();
-  
+
   const investments = data?.data || [];
   const total = data?.pagination.total || 0;
   const totalPages = data?.pagination.totalPages || 0;
 
   const handleDelete = (id: string) => {
-    const investment = investments.find(inv => inv.id === id);
+    const investment = investments.find((inv) => inv.id === id);
     confirmDialog.confirm({
       title: 'Delete Investment',
       message: `Are you sure you want to delete this investment in "${investment?.asset?.assetName}"? This action cannot be undone.`,
@@ -66,7 +66,7 @@ export const InvestmentsPage: React.FC = () => {
     setSearchParams({});
     setPage(1);
   };
-  
+
   const goToPage = (pageNum: number) => setPage(pageNum);
   const nextPage = () => page < totalPages && setPage(page + 1);
   const prevPage = () => page > 1 && setPage(page - 1);
@@ -76,12 +76,8 @@ export const InvestmentsPage: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">
-              Investments
-            </h1>
-            <p className="text-slate-400 mt-1">
-              Manage your investment entries.
-            </p>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Investments</h1>
+            <p className="text-slate-400 mt-1">Manage your investment entries.</p>
           </div>
           {(assetId || userId) && (
             <button
@@ -104,7 +100,9 @@ export const InvestmentsPage: React.FC = () => {
             {userId && filterUser && (
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm">
                 <span className="text-slate-400">User:</span>
-                <span className="text-white font-medium">{filterUser.name || filterUser.email}</span>
+                <span className="text-white font-medium">
+                  {filterUser.name || filterUser.email}
+                </span>
               </div>
             )}
           </div>

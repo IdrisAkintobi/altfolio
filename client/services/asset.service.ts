@@ -1,4 +1,4 @@
-import { Asset, AssetPerformanceHistory, AssetType } from '../../shared/types';
+import { Asset, AssetPerformanceHistory, AssetType } from '@shared/types';
 import { apiClient } from '../lib/api';
 
 interface PaginatedResponse<T> {
@@ -28,7 +28,12 @@ interface CreateAssetRequest {
 }
 
 export const assetService = {
-  async getAll(page = 1, limit = 100, search?: string, assetType?: string): Promise<PaginatedResponse<Asset>> {
+  async getAll(
+    page = 1,
+    limit = 100,
+    search?: string,
+    assetType?: string
+  ): Promise<PaginatedResponse<Asset>> {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -39,9 +44,7 @@ export const assetService = {
     if (assetType && assetType !== 'All') {
       params.append('assetType', assetType);
     }
-    return apiClient.get<PaginatedResponse<Asset>>(
-      `/assets?${params.toString()}`
-    );
+    return apiClient.get<PaginatedResponse<Asset>>(`/assets?${params.toString()}`);
   },
 
   async getByType(type: AssetType): Promise<ApiResponse<Asset[]>> {
@@ -60,7 +63,7 @@ export const assetService = {
     if (params?.startDate) queryParams.append('startDate', params.startDate);
     if (params?.endDate) queryParams.append('endDate', params.endDate);
     if (params?.limit) queryParams.append('limit', params.limit.toString());
-    
+
     const query = queryParams.toString();
     return apiClient.get<ApiResponse<AssetPerformanceHistory[]>>(
       `/assets/${id}/performance-history${query ? `?${query}` : ''}`

@@ -4,6 +4,7 @@
 
 - [ ] Unit & integration tests
 - [ ] Rate limiting
+- [ ] Implement refresh token with short-lived JWT
 
 ## Medium Priority
 
@@ -26,5 +27,5 @@
 
 - [ ] Component refactoring
 - [ ] API documentation (Swagger)
-- [ ] CI/CD pipeline
+- [ ] CD pipeline
 - [ ] Monitoring & observability (metrics, health checks, APM)

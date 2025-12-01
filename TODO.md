@@ -5,6 +5,7 @@
 - [ ] Unit & integration tests
 - [ ] Rate limiting
 - [ ] Implement refresh token with short-lived JWT
+- [ ] Implement toast notifications for user feedback
 
 ## Medium Priority
 

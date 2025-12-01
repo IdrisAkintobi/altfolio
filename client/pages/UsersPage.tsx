@@ -94,14 +94,6 @@ export const UsersPage: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
-        {error instanceof Error ? error.message : 'Failed to fetch users'}
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="mb-6">

@@ -14,7 +14,6 @@
 - [ ] Table column sorting (assets, investments, users)
 - [ ] Export portfolio data (CSV/PDF)
 - [ ] User profile & password change
-- [ ] Mobile responsiveness improvements
 
 ## Low Priority
 

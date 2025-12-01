@@ -73,16 +73,20 @@ export const InvestmentsPage: React.FC = () => {
 
   return (
     <>
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Investments</h1>
-            <p className="text-slate-400 mt-1">Manage your investment entries.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Investments
+            </h1>
+            <p className="text-slate-400 mt-1 text-sm sm:text-base">
+              Manage your investment entries.
+            </p>
           </div>
           {(assetId || userId) && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm w-full sm:w-auto"
             >
               <X className="w-4 h-4" />
               Clear Filters
@@ -94,13 +98,15 @@ export const InvestmentsPage: React.FC = () => {
             {assetId && filterAsset && (
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-sm">
                 <span className="text-slate-400">Asset:</span>
-                <span className="text-white font-medium">{filterAsset.assetName}</span>
+                <span className="text-white font-medium truncate max-w-[200px]">
+                  {filterAsset.assetName}
+                </span>
               </div>
             )}
             {userId && filterUser && (
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm">
                 <span className="text-slate-400">User:</span>
-                <span className="text-white font-medium">
+                <span className="text-white font-medium truncate max-w-[200px]">
                   {filterUser.name || filterUser.email}
                 </span>
               </div>

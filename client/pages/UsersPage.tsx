@@ -96,20 +96,22 @@ export const UsersPage: React.FC = () => {
 
   return (
     <>
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Users</h1>
-            <p className="text-slate-400 mt-1">Manage platform users and their roles.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Users</h1>
+            <p className="text-slate-400 mt-1 text-sm sm:text-base">
+              Manage platform users and their roles.
+            </p>
           </div>
-          <div className="text-sm text-slate-400">Total: {total} users</div>
+          <div className="text-xs sm:text-sm text-slate-400">Total: {total} users</div>
         </div>
 
         <SearchInput
           value={search}
           onChange={handleSearch}
           placeholder="Search by name or email..."
-          className="max-w-md"
+          className="w-full sm:max-w-md"
         />
       </div>
 

@@ -114,9 +114,9 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center mb-4">
-        <div className="text-sm text-slate-400">
+        <div className="text-xs sm:text-sm text-slate-400">
           Showing {investments.length} of {total} investments
         </div>
       </div>

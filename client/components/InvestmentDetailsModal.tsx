@@ -60,7 +60,7 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
               <Briefcase className="w-5 h-5 text-indigo-400" />
               <h3 className="text-lg font-semibold text-white">Asset Information</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-slate-400">Asset Name</div>
                 <div className="text-sm font-medium text-white mt-1">
@@ -99,7 +99,7 @@ export const InvestmentDetailsModal: React.FC<InvestmentDetailsModalProps> = ({
               <DollarSign className="w-5 h-5 text-emerald-400" />
               <h3 className="text-lg font-semibold text-white">Investment Details</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-slate-400">Invested Amount</div>
                 <div className="text-lg font-semibold text-white mt-1">

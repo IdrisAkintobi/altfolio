@@ -56,26 +56,26 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between border-t border-slate-800 px-6 py-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-400">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800 px-4 sm:px-6 py-4">
+      <div className="flex items-center gap-2 order-2 sm:order-1">
+        <span className="text-xs sm:text-sm text-slate-400">
           Page {currentPage} of {totalPages}
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto justify-center">
         <Button
           variant="ghost"
           size="sm"
           onClick={onPrev}
           disabled={currentPage === 1}
-          className="gap-1"
+          className="gap-1 flex-shrink-0"
         >
           <ChevronLeft className="w-4 h-4" />
-          Previous
+          <span className="hidden sm:inline">Previous</span>
         </Button>
 
-        <div className="flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1">
           {getPageNumbers().map((page, index) =>
             page === '...' ? (
               <span key={`ellipsis-${index}`} className="px-2 text-slate-500">
@@ -105,9 +105,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           size="sm"
           onClick={onNext}
           disabled={currentPage === totalPages}
-          className="gap-1"
+          className="gap-1 flex-shrink-0"
         >
-          Next
+          <span className="hidden sm:inline">Next</span>
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>

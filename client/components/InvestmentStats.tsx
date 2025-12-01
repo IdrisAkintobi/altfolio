@@ -52,25 +52,27 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({ investments })
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-400">Total Portfolio Value</p>
-              <h2 className="text-3xl font-bold text-white mt-2">{formatCurrency(totalValue)}</h2>
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-slate-400">Total Portfolio Value</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-white mt-1 sm:mt-2 truncate">
+                {formatCurrency(totalValue)}
+              </h2>
             </div>
-            <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-emerald-500" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
+              <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-400">Total Return</p>
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-slate-400">Total Return</p>
               <h2
-                className={`text-3xl font-bold mt-2 ${
+                className={`text-xl sm:text-3xl font-bold mt-1 sm:mt-2 truncate ${
                   totalReturn >= 0 ? 'text-emerald-400' : 'text-red-400'
                 }`}
               >
@@ -83,20 +85,22 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({ investments })
                 {returnPercentage.toFixed(2)}% All time
               </p>
             </div>
-            <div className="w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-indigo-500" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-500/10 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-400">Total Assets</p>
-              <h2 className="text-3xl font-bold text-white mt-2">{investments.length}</h2>
+          <CardContent className="p-4 sm:p-6 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-slate-400">Total Assets</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-white mt-1 sm:mt-2">
+                {investments.length}
+              </h2>
             </div>
-            <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-blue-500" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/10 rounded-full flex items-center justify-center flex-shrink-0 ml-2">
+              <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
             </div>
           </CardContent>
         </Card>
@@ -112,21 +116,21 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({ investments })
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="min-h-[400px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <Card className="min-h-[350px] sm:min-h-[400px]">
             <CardHeader>
-              <CardTitle>Asset Allocation</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Asset Allocation</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" aspect={2} minHeight={300}>
+              <div className="h-[250px] sm:h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={allocationData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
+                      innerRadius={50}
+                      outerRadius={80}
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -146,23 +150,23 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({ investments })
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex flex-wrap gap-4 justify-center mt-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4 justify-center mt-4">
                 {allocationData.map((entry: { name: string; value: number }, index) => (
                   <div key={entry.name} className="flex items-center gap-2">
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-3 h-3 rounded-full flex-shrink-0"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
-                    <span className="text-sm text-slate-400">{entry.name}</span>
+                    <span className="text-xs sm:text-sm text-slate-400">{entry.name}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="min-h-[400px] flex flex-col">
+          <Card className="min-h-[350px] sm:min-h-[400px] flex flex-col">
             <CardHeader>
-              <CardTitle>Performance by Asset</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Performance by Asset</CardTitle>
             </CardHeader>
             <CardContent className="flex-1">
               <ResponsiveContainer width="100%" height="100%">
@@ -174,7 +178,7 @@ export const InvestmentStats: React.FC<InvestmentStatsProps> = ({ investments })
                   <XAxis dataKey="name" hide={true} />
                   <YAxis
                     stroke="#94a3b8"
-                    fontSize={12}
+                    fontSize={11}
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(val) => `$${val / 1000}k`}
